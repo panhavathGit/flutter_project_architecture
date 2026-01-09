@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/post_provider.dart';
-
+import '../../../../features/comments/presentation/pages/comment_page.dart';
 class PostPage extends StatefulWidget {
   const PostPage({super.key});
 
@@ -37,9 +37,23 @@ class _PostPageState extends State<PostPage> {
             itemCount: provider.posts.length,
             itemBuilder: (context, index) {
               final post = provider.posts[index];
+              // return ListTile(
+              //   title: Text(post.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+              //   subtitle: Text(post.body),
+              // );
               return ListTile(
                 title: Text(post.title, style: const TextStyle(fontWeight: FontWeight.bold)),
                 subtitle: Text(post.body),
+                trailing: const Icon(Icons.arrow_forward_ios), // Add an arrow
+                onTap: () {
+                  // Navigate to CommentPage and pass the post ID
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => CommentPage(postId: post.id),
+                    ),
+                  );
+                },
               );
             },
           );
