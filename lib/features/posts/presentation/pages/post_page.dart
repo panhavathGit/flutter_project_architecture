@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/post_provider.dart';
 import '../../../../features/comments/presentation/pages/comment_page.dart';
+import '../pages/post_add_update_page.dart';
 class PostPage extends StatefulWidget {
   const PostPage({super.key});
 
@@ -41,21 +42,62 @@ class _PostPageState extends State<PostPage> {
               //   title: Text(post.title, style: const TextStyle(fontWeight: FontWeight.bold)),
               //   subtitle: Text(post.body),
               // );
+              
+              // add push ListTile to view comment
+              // return ListTile(
+              //   title: Text(post.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+              //   subtitle: Text(post.body),
+              //   trailing: const Icon(Icons.arrow_forward_ios), // Add an arrow
+              //   onTap: () {
+              //     // Navigate to CommentPage and pass the post ID
+              //     Navigator.push(
+              //       context,
+              //       MaterialPageRoute(
+              //         builder: (context) => CommentPage(postId: post.id),
+              //       ),
+              //     );
+              //   },
+              // );
+
               return ListTile(
-                title: Text(post.title, style: const TextStyle(fontWeight: FontWeight.bold)),
+                title: Text(post.title),
                 subtitle: Text(post.body),
-                trailing: const Icon(Icons.arrow_forward_ios), // Add an arrow
-                onTap: () {
-                  // Navigate to CommentPage and pass the post ID
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => CommentPage(postId: post.id),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    // EDIT BUTTON
+                    IconButton(
+                      icon: const Icon(Icons.edit, color: Colors.blue),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => PostAddUpdatePage(post: post),
+                          ),
+                        );
+                      },
                     ),
-                  );
-                },
+                    // DELETE BUTTON
+                    IconButton(
+                      icon: const Icon(Icons.delete, color: Colors.red),
+                      onPressed: () {
+                        context.read<PostProvider>().deletePost(post.id);
+                      },
+                    ),
+                  ],
+                ),
               );
             },
+          );
+        },
+      ),
+      // Add FloatingActionButton to Scaffold
+      floatingActionButton: FloatingActionButton(
+        child: const Icon(Icons.add),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (_) => const PostAddUpdatePage()),
           );
         },
       ),

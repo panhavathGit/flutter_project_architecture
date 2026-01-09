@@ -14,6 +14,11 @@ import 'features/comments/data/repositories/comment_repository_impl.dart';
 import 'features/comments/domain/usecases/get_comments_usecase.dart';
 import 'features/comments/presentation/providers/comment_provider.dart';
 
+// --- Imports for feature 3: CRUD post ---
+import 'features/posts/domain/usecases/add_post_usecase.dart';
+import 'features/posts/domain/usecases/update_post_usecase.dart';
+import 'features/posts/domain/usecases/delete_post_usecase.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -26,22 +31,35 @@ class MyApp extends StatelessWidget {
     // ------------------------------------
     // 1. INJECTION FOR FEATURE: POSTS
     // ------------------------------------
+
+    // 1. Data Layer
     final postDataSource = PostRemoteDataSource();
     final postRepository = PostRepositoryImpl(postDataSource);
+
+    // 2. Domain Layer (4 UseCases)
     final getPostsUseCase = GetPostsUseCase(postRepository);
+    final addPostUseCase = AddPostUseCase(postRepository);
+    final updatePostUseCase = UpdatePostUseCase(postRepository);
+    final deletePostUseCase = DeletePostUseCase(postRepository);
 
     // ------------------------------------
     // 2. INJECTION FOR FEATURE: COMMENTS
     // ------------------------------------
     final commentDataSource = CommentRemoteDataSource();
     final commentRepository = CommentRepositoryImpl(commentDataSource);
+
     final getCommentsUseCase = GetCommentsUseCase(commentRepository);
 
     return MultiProvider(
       providers: [
         // Provider 1: Posts
         ChangeNotifierProvider(
-          create: (_) => PostProvider(getPostsUseCase: getPostsUseCase),
+          create: (_) => PostProvider(
+            getPostsUseCase: getPostsUseCase,
+            addPostUseCase: addPostUseCase,
+            updatePostUseCase: updatePostUseCase,
+            deletePostUseCase: deletePostUseCase
+            ),
         ),
         
         // Provider 2: Comments (We add this here so it's available app-wide)
