@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../providers/post_provider.dart';
-import '../../../../features/comments/presentation/pages/comment_page.dart';
 import '../pages/post_add_update_page.dart';
 class PostPage extends StatefulWidget {
   const PostPage({super.key});
@@ -88,16 +87,6 @@ class _PostPageState extends State<PostPage> {
                 ),
               );
             },
-          );
-        },
-      ),
-      // Add FloatingActionButton to Scaffold
-      floatingActionButton: FloatingActionButton(
-        child: const Icon(Icons.add),
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(builder: (_) => const PostAddUpdatePage()),
           );
         },
       ),

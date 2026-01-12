@@ -19,6 +19,8 @@ import 'features/posts/domain/usecases/add_post_usecase.dart';
 import 'features/posts/domain/usecases/update_post_usecase.dart';
 import 'features/posts/domain/usecases/delete_post_usecase.dart';
 
+import 'main_screen.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -70,9 +72,13 @@ class MyApp extends StatelessWidget {
         ),
       ],
       child: MaterialApp(
-        title: 'Multi-Feature Clean Arch',
-        theme: ThemeData(primarySwatch: Colors.blue),
-        home: const PostPage(),
+        title: 'Social App',
+        theme: ThemeData(
+          primarySwatch: Colors.blue,
+          useMaterial3: true, // Let's look modern
+        ),
+        // CHANGE THIS LINE:
+        home: const MainScreen(),
       ),
     );
   }
