@@ -7,10 +7,9 @@ import '../../domain/usecases/delete_post_usecase.dart';
 
 class PostProvider extends ChangeNotifier {
   final GetPostsUseCase getPostsUseCase;
-
-  final AddPostUseCase addPostUseCase;       // NEW
-  final UpdatePostUseCase updatePostUseCase; // NEW
-  final DeletePostUseCase deletePostUseCase; // NEW
+  final AddPostUseCase addPostUseCase;
+  final UpdatePostUseCase updatePostUseCase;
+  final DeletePostUseCase deletePostUseCase;
 
   PostProvider({
     required this.getPostsUseCase,
@@ -33,7 +32,7 @@ class PostProvider extends ChangeNotifier {
   Future<void> fetchPosts() async {
     _isLoading = true;
     _errorMessage = null;
-    notifyListeners(); // Update UI to show spinner
+    notifyListeners();
 
     try {
       _posts = await getPostsUseCase.execute();
@@ -41,42 +40,61 @@ class PostProvider extends ChangeNotifier {
       _errorMessage = e.toString();
     } finally {
       _isLoading = false;
-      notifyListeners(); // Update UI to show data or error
+      notifyListeners();
     }
   }
 
-   // --- CRUD OPERATIONS ---
-
-  Future<void> addPost(String title, String body) async {
+  // --- CRUD OPERATIONS ---
+  Future<void> addPost(String title, String content, {String author = 'Anonymous'}) async {
     try {
       _errorMessage = null;
       
-      // 1. Create a temporary object (ID 0 represents a new item)
-      final newPost = Post(id: 0, title: title, body: body);
+      // Create a temporary post object (ID 0 for new posts)
+      final newPost = Post(
+        id: 0, 
+        title: title, 
+        content: content,
+        author: author,
+      );
 
-      // 2. Call API
+      // Call API
       final result = await addPostUseCase.execute(newPost);
 
-      // 3. API Success? Update LOCAL list manually so UI updates
-      _posts.insert(0, result); // Add to top of list
+      // Add to top of list
+      _posts.insert(0, result);
       notifyListeners();
       
     } catch (e) {
       _errorMessage = "Failed to create post: ${e.toString()}";
       notifyListeners();
-      rethrow; // Re-throw to let UI handle it
+      rethrow;
     }
   }
 
-  Future<void> updatePost(int id, String title, String body) async {
+  /// Update an existing post
+  Future<void> updatePost(
+    int id, 
+    String title, 
+    String content, 
+    {String? author}
+  ) async {
     try {
       _errorMessage = null;
-      final updatedPost = Post(id: id, title: title, body: body);
       
-      // 1. Call API and get the updated post
+      // Find the current post to preserve author if not provided
+      final currentPost = _posts.firstWhere((p) => p.id == id);
+      
+      final updatedPost = Post(
+        id: id, 
+        title: title, 
+        content: content,
+        author: author ?? currentPost.author,
+      );
+      
+      // Call API and get the updated post
       final result = await updatePostUseCase.execute(updatedPost);
 
-      // 2. API Success? Update LOCAL list with the returned PostModel
+      // Update local list
       final index = _posts.indexWhere((p) => p.id == id);
       if (index != -1) {
         _posts[index] = result;
@@ -85,21 +103,31 @@ class PostProvider extends ChangeNotifier {
     } catch (e) {
       _errorMessage = "Failed to update post: ${e.toString()}";
       notifyListeners();
-      rethrow; // Re-throw to let UI handle it
+      rethrow;
     }
   }
 
+  /// Delete a post by ID
   Future<void> deletePost(int id) async {
     try {
-      // 1. Call API
+      _errorMessage = null;
+      
+      // Call API
       await deletePostUseCase.execute(id);
 
-      // 2. API Success? Remove from LOCAL list
+      // Remove from local list
       _posts.removeWhere((p) => p.id == id);
       notifyListeners();
     } catch (e) {
-      _errorMessage = "Failed to delete";
+      _errorMessage = "Failed to delete post: ${e.toString()}";
       notifyListeners();
+      rethrow;
     }
+  }
+
+  /// Clear error message
+  void clearError() {
+    _errorMessage = null;
+    notifyListeners();
   }
 }
